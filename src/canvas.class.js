@@ -389,7 +389,7 @@
       });
 
       if (this._shouldCenterTransform(t.target)) {
-        if (t.action === 'rotate') {
+        if (t.action === 'rotate' || t.action === 'scale&rotate') {
           this._setOriginToCenter(t.target);
         }
         else {
@@ -532,7 +532,7 @@
       if (t.action === 'scale' || t.action === 'scaleX' || t.action === 'scaleY') {
         centerTransform = this.centeredScaling || target.centeredScaling;
       }
-      else if (t.action === 'rotate') {
+      else if (t.action === 'rotate' || t.action === 'scale&rotate') {
         centerTransform = this.centeredRotation || target.centeredRotation;
       }
 
@@ -586,6 +586,10 @@
           if (target.cornerStyle === 'editor') {
             return 'remove';
           }
+        case 'bl':
+          if (target.cornerStyle === 'editor') {
+            return 'scale&rotate';
+          }
         default:
           return 'scale';
       }
@@ -605,10 +609,6 @@
           corner = target._findTargetCorner(this.getPointer(e, true)),
           action = this._getActionFromCorner(target, corner, e),
           origin = this._getOriginFromCorner(target, corner);
-
-      if (action === 'remove') {
-        this.fire('object:remove', {target: target});
-      }
 
       this._currentTransform = {
         target: target,
@@ -965,7 +965,6 @@
      * @return {Boolean} true if the rotation occurred
      */
     _rotateObject: function (x, y) {
-
       var t = this._currentTransform;
 
       if (t.target.get('lockRotation')) {
@@ -977,13 +976,17 @@
           angle = radiansToDegrees(curAngle - lastAngle + t.theta),
           hasRoated = true;
 
+      // lock down area
+      angle = this._checkRotateLock(angle, 0);
+      angle = this._checkRotateLock(angle, 90);
+      angle = this._checkRotateLock(angle, 180);
+      angle = this._checkRotateLock(angle, 270);
       // normalize angle to positive value
       if (angle < 0) {
         angle = 360 + angle;
       }
 
-      angle %= 360
-
+      angle %= 360;
       if (t.target.snapAngle > 0) {
         var snapAngle  = t.target.snapAngle,
             snapThreshold  = t.target.snapThreshold || snapAngle,
@@ -1001,9 +1004,29 @@
           hasRoated = false
         }
       }
-
       t.target.angle = angle;
       return hasRoated;
+    },
+    /**
+     * lock the rotate action
+     * when angle in the setting area
+     * @param angle
+     * @param lockAngle
+     * @param area
+     * @returns {*}
+     * @private
+     */
+    _checkRotateLock: function (angle, lockAngle, area) {
+      area = area ? area : 5;
+      //console.log(Math.abs(angle), lockAngle + area);
+      if (Math.abs(Math.abs(angle) - lockAngle) < area) {
+        this.fire('object:rotateFix', {
+          angle: angle
+        });
+        return angle < 0 ? lockAngle * -1 : lockAngle;
+      } else {
+        return angle;
+      }
     },
 
     /**

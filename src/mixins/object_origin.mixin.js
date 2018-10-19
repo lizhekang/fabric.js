@@ -250,6 +250,10 @@
      */
     _getLeftTopCoords: function() {
       return this.translateToOriginPoint(this.getCenterPoint(), 'left', 'top');
+    },
+
+    _getRightTopCoords: function() {
+      return this.translateToOriginPoint(this.getCenterPoint(), 'right', 'top');
     }
   });
 

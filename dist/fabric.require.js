@@ -4284,7 +4284,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 top: t.original.top
             });
             if (this._shouldCenterTransform(t.target)) {
-                if (t.action === "rotate") {
+                if (t.action === "rotate" || t.action === "scale&rotate") {
                     this._setOriginToCenter(t.target);
                 } else {
                     if (t.originX !== "center") {
@@ -4352,7 +4352,7 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             var t = this._currentTransform, centerTransform;
             if (t.action === "scale" || t.action === "scaleX" || t.action === "scaleY") {
                 centerTransform = this.centeredScaling || target.centeredScaling;
-            } else if (t.action === "rotate") {
+            } else if (t.action === "rotate" || t.action === "scale&rotate") {
                 centerTransform = this.centeredRotation || target.centeredRotation;
             }
             return centerTransform ? !t.altKey : t.altKey;
@@ -4395,6 +4395,11 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                     return "remove";
                 }
 
+              case "bl":
+                if (target.cornerStyle === "editor") {
+                    return "scale&rotate";
+                }
+
               default:
                 return "scale";
             }
@@ -4404,11 +4409,6 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 return;
             }
             var pointer = this.getPointer(e), corner = target._findTargetCorner(this.getPointer(e, true)), action = this._getActionFromCorner(target, corner, e), origin = this._getOriginFromCorner(target, corner);
-            if (action === "remove") {
-                this.fire("object:remove", {
-                    target: target
-                });
-            }
             this._currentTransform = {
                 target: target,
                 action: action,
@@ -4629,6 +4629,10 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
                 return false;
             }
             var lastAngle = atan2(t.ey - t.top, t.ex - t.left), curAngle = atan2(y - t.top, x - t.left), angle = radiansToDegrees(curAngle - lastAngle + t.theta), hasRoated = true;
+            angle = this._checkRotateLock(angle, 0);
+            angle = this._checkRotateLock(angle, 90);
+            angle = this._checkRotateLock(angle, 180);
+            angle = this._checkRotateLock(angle, 270);
             if (angle < 0) {
                 angle = 360 + angle;
             }
@@ -4646,6 +4650,17 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             t.target.angle = angle;
             return hasRoated;
+        },
+        _checkRotateLock: function(angle, lockAngle, area) {
+            area = area ? area : 5;
+            if (Math.abs(Math.abs(angle) - lockAngle) < area) {
+                this.fire("object:rotateFix", {
+                    angle: angle
+                });
+                return angle < 0 ? lockAngle * -1 : lockAngle;
+            } else {
+                return angle;
+            }
         },
         setCursor: function(value) {
             this.upperCanvasEl.style.cursor = value;
@@ -5407,8 +5422,15 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
             var x = pointer.x, y = pointer.y, target = transform.target, action = transform.action, actionPerformed = false;
             if (action === "rotate") {
                 (actionPerformed = this._rotateObject(x, y)) && this._fire("rotating", target, e);
+            } else if (action === "scale&rotate") {
+                (actionPerformed = this._rotateObject(x, y)) && this._fire("rotating", target, e);
+                (actionPerformed = this._onScale(e, transform, x, y)) && this._fire("scaling", target, e);
             } else if (action === "scale") {
                 (actionPerformed = this._onScale(e, transform, x, y)) && this._fire("scaling", target, e);
+            } else if (action === "remove") {
+                this.fire("object:remove", {
+                    target: target
+                });
             } else if (action === "scaleX") {
                 (actionPerformed = this._scaleObject(x, y, "x")) && this._fire("scaling", target, e);
             } else if (action === "scaleY") {
@@ -6451,6 +6473,9 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, {
         },
         _getLeftTopCoords: function() {
             return this.translateToOriginPoint(this.getCenterPoint(), "left", "top");
+        },
+        _getRightTopCoords: function() {
+            return this.translateToOriginPoint(this.getCenterPoint(), "right", "top");
         }
     });
 })();

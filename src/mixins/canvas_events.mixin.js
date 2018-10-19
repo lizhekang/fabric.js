@@ -598,7 +598,6 @@
       }
 
       var groupSelector = this._groupSelector;
-
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
         pointer = this.getPointer(e, true);
@@ -654,12 +653,18 @@
           target = transform.target,
           action = transform.action,
           actionPerformed = false;
-
       if (action === 'rotate') {
         (actionPerformed = this._rotateObject(x, y)) && this._fire('rotating', target, e);
       }
+      else if (action === 'scale&rotate') {
+        (actionPerformed = this._rotateObject(x, y)) && this._fire('rotating', target, e);
+        (actionPerformed = this._onScale(e, transform, x, y)) && this._fire('scaling', target, e);
+      }
       else if (action === 'scale') {
         (actionPerformed = this._onScale(e, transform, x, y)) && this._fire('scaling', target, e);
+      }
+      else if (action === 'remove') {
+        this.fire('object:remove', {target: target});
       }
       else if (action === 'scaleX') {
         (actionPerformed = this._scaleObject(x, y, 'x')) && this._fire('scaling', target, e);
@@ -727,7 +732,6 @@
         if (!transform.reset && transform.currentAction === 'scale') {
           this._resetCurrentTransform();
         }
-
         transform.currentAction = 'scaleEqually';
         return this._scaleObject(x, y, 'equally');
       }
