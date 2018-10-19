@@ -1,4 +1,4 @@
- {
+{
   "name": "fabric",
   "description": "Object model for HTML5 canvas, and SVG-to-canvas parser. Backed by jsdom and node-canvas.",
   "homepage": "http://fabricjs.com/",
@@ -20,11 +20,11 @@
     "HTML5",
     "object model"
   ],
-  "browser" : {
-    "canvas" : false,
-    "fs":      false,
-    "jsdom":   false,
-    "xmldom":  false
+  "browser": {
+    "canvas": false,
+    "fs": false,
+    "jsdom": false,
+    "xmldom": false
   },
   "repository": {
     "type": "git",

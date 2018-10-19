@@ -88,7 +88,7 @@
      * @param {Boolean} noTransform
      */
     _render: function(ctx, noTransform) {
-
+      
       // optimize 1x1 case (used in spray brush)
       if (this.width === 1 && this.height === 1) {
         ctx.fillRect(-0.5, -0.5, 1, 1);

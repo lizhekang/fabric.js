@@ -582,6 +582,10 @@
         case 'mt':
         case 'mb':
           return e[this.altActionKey] ? 'skewX' : 'scaleY';
+        case 'tr':
+          if (target.cornerStyle === 'editor') {
+            return 'remove';
+          }
         default:
           return 'scale';
       }
@@ -601,6 +605,10 @@
           corner = target._findTargetCorner(this.getPointer(e, true)),
           action = this._getActionFromCorner(target, corner, e),
           origin = this._getOriginFromCorner(target, corner);
+
+      if (action === 'remove') {
+        this.fire('object:remove', {target: target});
+      }
 
       this._currentTransform = {
         target: target,
