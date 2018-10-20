@@ -321,6 +321,14 @@
 
       if (target) {
         target.isMoving = false;
+        if (target.cornerStyle === 'editor') {
+          var corner = target._findTargetCorner(this.getPointer(e, true));
+          if (corner === 'tr') {
+            this.fire('object:remove', {
+              target: corner
+            })
+          }
+        }
       }
 
       this._handleCursorAndEvent(e, target, 'up');
@@ -664,7 +672,8 @@
         (actionPerformed = this._onScale(e, transform, x, y)) && this._fire('scaling', target, e);
       }
       else if (action === 'remove') {
-        this.fire('object:remove', {target: target});
+        // TODO: 这里需要拖动才能触发
+        // this.fire('object:remove', {target: target});
       }
       else if (action === 'scaleX') {
         (actionPerformed = this._scaleObject(x, y, 'x')) && this._fire('scaling', target, e);
