@@ -183,6 +183,7 @@ var filesToInclude = [
   ifSpecifiedInclude('freedrawing', 'src/brushes/circle_brush.class.js'),
   ifSpecifiedInclude('freedrawing', 'src/brushes/spray_brush.class.js'),
   ifSpecifiedInclude('freedrawing', 'src/brushes/pattern_brush.class.js'),
+  ifSpecifiedInclude('freedrawing', 'src/brushes/mosaic_brush.class.js'),
 
   ifSpecifiedInclude('interaction', 'src/canvas.class.js'),
   ifSpecifiedInclude('interaction', 'src/mixins/canvas_events.mixin.js'),

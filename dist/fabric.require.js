@@ -4185,6 +4185,61 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
     }
 });
 
+fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
+    getPatternSrc: function(canvas) {
+        var patternCanvas = fabric.document.createElement("canvas"), patternCtx = patternCanvas.getContext("2d"), lowerCanvas = canvas.lowerCanvasEl, realHeight = lowerCanvas.height, realWidth = lowerCanvas.width, clientHeight = canvas.height, clientWidth = canvas.width, ctx = canvas.getContext("2d");
+        var blocksize = 10;
+        patternCanvas.width = clientWidth;
+        patternCanvas.height = clientHeight;
+        patternCtx.scale(clientWidth / realWidth, clientHeight / realHeight);
+        patternCtx.drawImage(ctx.canvas, 0, 0);
+        var imageData = patternCtx.getImageData(0, 0, realWidth, realHeight);
+        patternCtx.putImageData(getMosaicData(imageData, blocksize), 0, 0);
+        function getMosaicData(imageData, blocksize) {
+            var data = imageData.data, iLen = imageData.height, jLen = imageData.width, index, i, j, r, g, b, a;
+            for (i = 0; i < iLen; i += blocksize) {
+                for (j = 0; j < jLen; j += blocksize) {
+                    index = i * 4 * jLen + j * 4;
+                    r = data[index];
+                    g = data[index + 1];
+                    b = data[index + 2];
+                    a = data[index + 3];
+                    for (var _i = i, _ilen = i + blocksize; _i < _ilen; _i++) {
+                        for (var _j = j, _jlen = j + blocksize; _j < _jlen; _j++) {
+                            index = _i * 4 * jLen + _j * 4;
+                            data[index] = r;
+                            data[index + 1] = g;
+                            data[index + 2] = b;
+                            data[index + 3] = a;
+                        }
+                    }
+                }
+            }
+            return imageData;
+        }
+        return patternCanvas;
+    },
+    getPatternSrcFunction: function() {
+        return String(this.getPatternSrc).replace("this.color", '"' + this.color + '"');
+    },
+    getPattern: function() {
+        return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(this.canvas), "repeat");
+    },
+    _setBrushStyles: function() {
+        this.callSuper("_setBrushStyles");
+        this.canvas.contextTop.strokeStyle = this.getPattern();
+    },
+    createPath: function(pathData) {
+        var path = this.callSuper("createPath", pathData), topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+        path.stroke = new fabric.Pattern({
+            source: this.source || this.getPatternSrcFunction(),
+            offsetX: -topLeft.x,
+            offsetY: -topLeft.y
+        });
+        return path;
+    }
+});
+
 (function() {
     var getPointer = fabric.util.getPointer, degreesToRadians = fabric.util.degreesToRadians, radiansToDegrees = fabric.util.radiansToDegrees, atan2 = Math.atan2, abs = Math.abs, supportLineDash = fabric.StaticCanvas.supports("setLineDash"), STROKE_OFFSET = .5;
     fabric.Canvas = fabric.util.createClass(fabric.StaticCanvas, {
@@ -6972,6 +7027,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
             this._setLineDash(ctx, this.cornerDashArray, null);
             if (this.cornerStyle === "editor") {
+                console.log("drawControl");
                 ctx.drawImage(del, left + width, top, this.cornerSize, this.cornerSize);
                 ctx.drawImage(resize, left, top + height, this.cornerSize, this.cornerSize);
             } else if (this.cornerStyle === "cropper") {

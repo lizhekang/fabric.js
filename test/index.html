@@ -7,13 +7,23 @@
 <body>
 <canvas id="test" width="500" height="500"></canvas>
 <button onclick="del()" type="button">del</button>
+<button onclick="mosaic()" type="button">mosaic</button>
+<input type='file' accept="image/*" multiple v-on:change="fileChange"/>
 </body>
 <script src="../dist/fabric.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.3.1.slim.js"
+        integrity="sha256-fNXJFIlca05BIO2Y5zh1xrShK3ME+/lYZ0j+ChxX2DA="
+        crossorigin="anonymous"></script>
 <script>
-  let canvas = new fabric.Canvas('test');
+  let canvas = new fabric.Canvas('test', {
+    width: 500,
+    height: 500
+  });
+
   let rect = new fabric.Rect({
-    left: 150,
-    top: 200,
+    left: 10,
+    top: 10,
     width: 100,
     height: 100,
     cornerColor: 'yellow',
@@ -28,8 +38,8 @@
   canvas.add(rect);
 
   let text = new fabric.Text('test 123!', {
-    left: 150,
-    top: 200,
+    left: 10,
+    top: 10,
     cornerStyle: 'editor',
     cornerSize: 24,
     borderLineWidth: 2,
@@ -51,5 +61,30 @@
     console.log(obj);
     canvas.remove(obj);
   }
+
+  function mosaic() {
+    canvas.isDrawingMode = true;
+    var ca = document.getElementById('test');
+    var ctx = canvas.getContext('2d');
+    var width = canvas.width * 2;
+    var height = canvas.height * 2;
+    var imageData = ctx.getImageData(0, 0, width, height);
+
+    // 笔刷
+    var brush = new fabric.MosaicBrush(canvas);
+    canvas.freeDrawingBrush = brush;
+    canvas.freeDrawingBrush.width = 50;
+  }
+
+  // 图片选择
+  var $files = $('input:file');
+  $files.change((e) => {
+    var file = e.target.files[0];
+    var url = URL.createObjectURL(file);
+
+    fabric.Image.fromURL(url, (img) => {
+      canvas.add(img);
+    })
+  })
 </script>
 </html>
