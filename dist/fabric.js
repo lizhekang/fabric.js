@@ -8393,8 +8393,8 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       clientWidth = upperCanvas.width,
       ctx = lowerCanvas.getContext('2d');
 
-    var blocksize =  10;
-
+    var blocksize =  this.blocksize || 10;
+    console.log(blocksize);
     // 临时图层用于存放经过马赛克处理的原图
     // 大小为用户所见canvas大小
     patternCanvas.width = clientWidth;
@@ -8456,6 +8456,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
     return String(this.getPatternSrc)
       .replace('this.upperQuery', '"' + this.upperQuery + '"')
       .replace('this.lowerQuery', '"' + this.lowerQuery + '"')
+      .replace('this.blocksize', this.blocksize);
     //return String(this.getPatternSrc)
   },
 
@@ -8466,6 +8467,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
     var canvas = this.canvas;
     this.upperQuery = fabric.util.Simmer(canvas.upperCanvasEl);
     this.lowerQuery = fabric.util.Simmer(canvas.lowerCanvasEl);
+    this.blocksize = this.blocksize || 10;
 
     return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), 'repeat');
   },

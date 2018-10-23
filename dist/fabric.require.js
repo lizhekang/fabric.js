@@ -5450,7 +5450,8 @@ fabric.PatternBrush = fabric.util.createClass(fabric.PencilBrush, {
 fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
     getPatternSrc: function() {
         var patternCanvas = fabric.document.createElement("canvas"), patternCtx = patternCanvas.getContext("2d"), lowerCanvas = document.querySelector(this.lowerQuery), realHeight = lowerCanvas.height, realWidth = lowerCanvas.width, upperCanvas = document.querySelector(this.upperQuery), clientHeight = upperCanvas.height, clientWidth = upperCanvas.width, ctx = lowerCanvas.getContext("2d");
-        var blocksize = 10;
+        var blocksize = this.blocksize || 10;
+        console.log(blocksize);
         patternCanvas.width = clientWidth;
         patternCanvas.height = clientHeight;
         patternCtx.scale(clientWidth / realWidth, clientHeight / realHeight);
@@ -5482,12 +5483,13 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
         return patternCanvas;
     },
     getPatternSrcFunction: function() {
-        return String(this.getPatternSrc).replace("this.upperQuery", '"' + this.upperQuery + '"').replace("this.lowerQuery", '"' + this.lowerQuery + '"');
+        return String(this.getPatternSrc).replace("this.upperQuery", '"' + this.upperQuery + '"').replace("this.lowerQuery", '"' + this.lowerQuery + '"').replace("this.blocksize", this.blocksize);
     },
     getPattern: function() {
         var canvas = this.canvas;
         this.upperQuery = fabric.util.Simmer(canvas.upperCanvasEl);
         this.lowerQuery = fabric.util.Simmer(canvas.lowerCanvasEl);
+        this.blocksize = this.blocksize || 10;
         return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), "repeat");
     },
     _setBrushStyles: function() {
