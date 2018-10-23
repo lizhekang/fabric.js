@@ -8723,6 +8723,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       this._initRetinaScaling();
 
       this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+      this.MosaicDrawingBrush = fabric.MosaicBrush && new fabric.MosaicBrush(this);
 
       this.calcOffset();
     },

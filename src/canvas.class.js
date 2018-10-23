@@ -301,6 +301,7 @@
       this._initRetinaScaling();
 
       this.freeDrawingBrush = fabric.PencilBrush && new fabric.PencilBrush(this);
+      this.MosaicDrawingBrush = fabric.MosaicBrush && new fabric.MosaicBrush(this);
 
       this.calcOffset();
     },
