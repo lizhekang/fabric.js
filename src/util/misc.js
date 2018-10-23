@@ -1,5 +1,4 @@
 (function(global) {
-
   var sqrt = Math.sqrt,
       atan2 = Math.atan2,
       pow = Math.pow,

@@ -3,17 +3,19 @@
  * @class fabric.PatternBrush
  * @extends fabric.BaseBrush
  */
+
 fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabric.PatternBrush.prototype */ {
 
-  getPatternSrc: function(canvas) {
+  getPatternSrc: function() {
     var patternCanvas = fabric.document.createElement('canvas'),
       patternCtx = patternCanvas.getContext('2d'),
-      lowerCanvas = canvas.lowerCanvasEl,
+      lowerCanvas = document.querySelector(this.lowerQuery),
       realHeight = lowerCanvas.height,
       realWidth = lowerCanvas.width,
-      clientHeight = canvas.height,
-      clientWidth = canvas.width,
-      ctx = canvas.getContext('2d');
+      upperCanvas = document.querySelector(this.upperQuery),
+      clientHeight = upperCanvas.height,
+      clientWidth = upperCanvas.width,
+      ctx = lowerCanvas.getContext('2d');
 
     var blocksize =  10;
 
@@ -75,15 +77,21 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
   },
 
   getPatternSrcFunction: function() {
-
-    return String(this.getPatternSrc).replace('this.color', '"' + this.color + '"');
+    return String(this.getPatternSrc)
+      .replace('this.upperQuery', '"' + this.upperQuery + '"')
+      .replace('this.lowerQuery', '"' + this.lowerQuery + '"')
+    //return String(this.getPatternSrc)
   },
 
   /**
    * Creates "pattern" instance property
    */
   getPattern: function() {
-    return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(this.canvas), 'repeat');
+    var canvas = this.canvas;
+    this.upperQuery = fabric.util.Simmer(canvas.upperCanvasEl);
+    this.lowerQuery = fabric.util.Simmer(canvas.lowerCanvasEl);
+
+    return this.canvas.contextTop.createPattern(this.source || this.getPatternSrc(), 'repeat');
   },
 
   /**
