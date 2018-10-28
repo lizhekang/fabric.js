@@ -243,12 +243,23 @@
       ctx.strokeStyle = this.borderColor;
       this._setLineDash(ctx, this.borderDashArray, null);
 
-      ctx.strokeRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height
-      );
+      if (this.cornerStyle === 'editor') {
+        // 编译模式需要预留更多的空间
+        var extra = this.cornerSize / 2;
+        ctx.strokeRect(
+          -width / 2 - extra,
+          -height / 2,
+          width + extra * 2,
+          height
+        );
+      }else {
+        ctx.strokeRect(
+          -width / 2,
+          -height / 2,
+          width,
+          height
+        );
+      }
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
@@ -329,13 +340,12 @@
       this._setLineDash(ctx, this.cornerDashArray, null);
 
       if (this.cornerStyle === 'editor') {
-        console.log('drawControl');
-
+        var extra = this.cornerSize / 2;
         // top-right
-        ctx.drawImage(del, left + width, top, this.cornerSize, this.cornerSize);
+        ctx.drawImage(del, left + width + extra, top, this.cornerSize, this.cornerSize);
 
         // bottom-left
-        ctx.drawImage(resize, left, top + height, this.cornerSize, this.cornerSize);
+        ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
       } else if (this.cornerStyle === 'cropper') {
         var l = left + this.cornerSize / 2;
         var t = top + this.cornerSize / 2;

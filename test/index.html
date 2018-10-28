@@ -42,11 +42,14 @@
   let text = new fabric.Text('test 123!', {
     left: 10,
     top: 10,
-    cornerStyle: 'editor',
-    cornerSize: 24,
+    borderColor: "#fff",
     borderLineWidth: 2,
-    borderColor: '#fff',
-    hasRotatingPoint: true
+    cornerSize: 24,
+    cornerStyle: "editor",
+    fill: "#ffbb3b",
+    fontFamily: "Noto Sans",
+    fontSize: 50,
+    hasRotatingPoint: false
   });
   canvas.add(text);
   canvas.renderAll();

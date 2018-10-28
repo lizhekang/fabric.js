@@ -246,7 +246,8 @@
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
-      !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
+      // Treat Document Level Touch Event Listeners as Passive DOM
+      // !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
 
@@ -324,9 +325,7 @@
         if (target.cornerStyle === 'editor') {
           var corner = target._findTargetCorner(this.getPointer(e, true));
           if (corner === 'tr') {
-            this.fire('object:remove', {
-              target: corner
-            })
+            this.fire('object:remove', target)
           }
         }
       }

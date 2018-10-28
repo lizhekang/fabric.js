@@ -9521,7 +9521,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       //console.log(Math.abs(angle), lockAngle + area);
       if (Math.abs(Math.abs(angle) - lockAngle) < area) {
         this.fire('object:rotateFix', {
-          angle: angle
+          angle: lockAngle
         });
         return angle < 0 ? lockAngle * -1 : lockAngle;
       } else {
@@ -10430,7 +10430,8 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
      * @param {Event} e Event object fired on mousemove
      */
     _onMouseMove: function (e) {
-      !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
+      // Treat Document Level Touch Event Listeners as Passive DOM
+      // !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
       this.__onMouseMove(e);
     },
 
@@ -10508,9 +10509,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
         if (target.cornerStyle === 'editor') {
           var corner = target._findTargetCorner(this.getPointer(e, true));
           if (corner === 'tr') {
-            this.fire('object:remove', {
-              target: corner
-            })
+            this.fire('object:remove', target)
           }
         }
       }
@@ -14515,12 +14514,23 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       ctx.strokeStyle = this.borderColor;
       this._setLineDash(ctx, this.borderDashArray, null);
 
-      ctx.strokeRect(
-        -width / 2,
-        -height / 2,
-        width,
-        height
-      );
+      if (this.cornerStyle === 'editor') {
+        // 编译模式需要预留更多的空间
+        var extra = this.cornerSize / 2;
+        ctx.strokeRect(
+          -width / 2 - extra,
+          -height / 2,
+          width + extra * 2,
+          height
+        );
+      }else {
+        ctx.strokeRect(
+          -width / 2,
+          -height / 2,
+          width,
+          height
+        );
+      }
 
       if (this.hasRotatingPoint && this.isControlVisible('mtr') && !this.get('lockRotation') && this.hasControls) {
 
@@ -14601,13 +14611,12 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
       this._setLineDash(ctx, this.cornerDashArray, null);
 
       if (this.cornerStyle === 'editor') {
-        console.log('drawControl');
-
+        var extra = this.cornerSize / 2;
         // top-right
-        ctx.drawImage(del, left + width, top, this.cornerSize, this.cornerSize);
+        ctx.drawImage(del, left + width + extra, top, this.cornerSize, this.cornerSize);
 
         // bottom-left
-        ctx.drawImage(resize, left, top + height, this.cornerSize, this.cornerSize);
+        ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
       } else if (this.cornerStyle === 'cropper') {
         var l = left + this.cornerSize / 2;
         var t = top + this.cornerSize / 2;

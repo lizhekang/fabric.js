@@ -5978,7 +5978,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
             area = area ? area : 5;
             if (Math.abs(Math.abs(angle) - lockAngle) < area) {
                 this.fire("object:rotateFix", {
-                    angle: angle
+                    angle: lockAngle
                 });
                 return angle < 0 ? lockAngle * -1 : lockAngle;
             } else {
@@ -6527,7 +6527,6 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
         },
         _onMouseMove: function(e) {
-            !this.allowTouchScrolling && e.preventDefault && e.preventDefault();
             this.__onMouseMove(e);
         },
         _onResize: function() {
@@ -6560,9 +6559,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
                 if (target.cornerStyle === "editor") {
                     var corner = target._findTargetCorner(this.getPointer(e, true));
                     if (corner === "tr") {
-                        this.fire("object:remove", {
-                            target: corner
-                        });
+                        this.fire("object:remove", target);
                     }
                 }
             }
@@ -8259,7 +8256,12 @@ fabric.util.object.extend(fabric.Object.prototype, {
             ctx.lineWidth = this.borderLineWidth;
             ctx.strokeStyle = this.borderColor;
             this._setLineDash(ctx, this.borderDashArray, null);
-            ctx.strokeRect(-width / 2, -height / 2, width, height);
+            if (this.cornerStyle === "editor") {
+                var extra = this.cornerSize / 2;
+                ctx.strokeRect(-width / 2 - extra, -height / 2, width + extra * 2, height);
+            } else {
+                ctx.strokeRect(-width / 2, -height / 2, width, height);
+            }
             if (this.hasRotatingPoint && this.isControlVisible("mtr") && !this.get("lockRotation") && this.hasControls) {
                 var rotateHeight = -height / 2;
                 ctx.beginPath();
@@ -8295,9 +8297,9 @@ fabric.util.object.extend(fabric.Object.prototype, {
             }
             this._setLineDash(ctx, this.cornerDashArray, null);
             if (this.cornerStyle === "editor") {
-                console.log("drawControl");
-                ctx.drawImage(del, left + width, top, this.cornerSize, this.cornerSize);
-                ctx.drawImage(resize, left, top + height, this.cornerSize, this.cornerSize);
+                var extra = this.cornerSize / 2;
+                ctx.drawImage(del, left + width + extra, top, this.cornerSize, this.cornerSize);
+                ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
             } else if (this.cornerStyle === "cropper") {
                 var l = left + this.cornerSize / 2;
                 var t = top + this.cornerSize / 2;

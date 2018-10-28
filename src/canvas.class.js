@@ -1022,7 +1022,7 @@
       //console.log(Math.abs(angle), lockAngle + area);
       if (Math.abs(Math.abs(angle) - lockAngle) < area) {
         this.fire('object:rotateFix', {
-          angle: angle
+          angle: lockAngle
         });
         return angle < 0 ? lockAngle * -1 : lockAngle;
       } else {
