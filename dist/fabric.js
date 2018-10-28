@@ -13864,6 +13864,7 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
 
       var sinTh = Math.sin(theta),
           cosTh = Math.cos(theta),
+          extra = this.cornerStyle === 'editor' ? this.cornerSize / 2 : 0;  // 编辑模式下有偏移
           _angle = currentWidth > 0 ? Math.atan(currentHeight / currentWidth) : 0,
           _hypotenuse = (currentWidth / Math.cos(_angle)) / 2,
           offsetX = Math.cos(_angle + theta) * _hypotenuse,
@@ -13872,8 +13873,8 @@ fabric.util.object.extend(fabric.StaticCanvas.prototype, /** @lends fabric.Stati
           // offset added for rotate and scale actions
           coords = fabric.util.transformPoint(this.getCenterPoint(), vpt),
           tl  = new fabric.Point(coords.x - offsetX, coords.y - offsetY),
-          tr  = new fabric.Point(tl.x + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
-          bl  = new fabric.Point(tl.x - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
+          tr  = new fabric.Point(tl.x + extra + (currentWidth * cosTh), tl.y + (currentWidth * sinTh)),
+          bl  = new fabric.Point(tl.x - extra - (currentHeight * sinTh), tl.y + (currentHeight * cosTh)),
           br  = new fabric.Point(coords.x + offsetX, coords.y + offsetY),
           ml  = new fabric.Point((tl.x + bl.x) / 2, (tl.y + bl.y) / 2),
           mt  = new fabric.Point((tr.x + tl.x) / 2, (tr.y + tl.y) / 2),
