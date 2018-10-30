@@ -347,11 +347,13 @@
         // bottom-left
         ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
       } else if (this.cornerStyle === 'cropper') {
-        var l = left + this.cornerSize / 2;
-        var t = top + this.cornerSize / 2;
-        var len = 16;
+        var cornerSize = this.cornerSize || 48;
+        var cornerWidth = this.cornerWidth || 4;
+        var l = left + cornerSize / 2;
+        var t = top + cornerSize / 2;
+        var len = cornerSize;
         ctx.strokeStyle = this.cornerColor;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = cornerWidth;
         // top-left
         ctx.beginPath();
         ctx.moveTo(l, t + len);

@@ -384,6 +384,7 @@
       this._renderTextBackground(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
+      this._setGradient(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
       this.clipTo && ctx.restore();
@@ -590,6 +591,31 @@
       }
 
       this._renderTextCommon(ctx, 'fillText');
+    },
+
+    /**
+     * 设置渐变笔触
+     * @private
+     */
+    _setGradient: function(ctx) {
+      if (this.gradient) {
+        var height = this.fontSize;
+        var width = this.width;
+        var array = this.gradient.array;
+        var isHorizon = this.gradient.horizon ? true : false;
+        var gradient = ctx.createLinearGradient(0 , 0, isHorizon ? width / 2.1 : 0, !isHorizon ? height / 2 : 0);
+
+        console.log('_setGradient', width);
+        for (var i in array) {
+          var item = array[i];
+          if (item.point !== undefined && item.point <= 1 && item.color) {
+            gradient.addColorStop(item.point, item.color);
+            console.log(item);
+          }
+        }
+
+        ctx.fillStyle = gradient;
+      }
     },
 
     /**

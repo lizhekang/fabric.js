@@ -14619,11 +14619,13 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         // bottom-left
         ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
       } else if (this.cornerStyle === 'cropper') {
-        var l = left + this.cornerSize / 2;
-        var t = top + this.cornerSize / 2;
-        var len = 16;
+        var cornerSize = this.cornerSize || 48;
+        var cornerWidth = this.cornerWidth || 4;
+        var l = left + cornerSize / 2;
+        var t = top + cornerSize / 2;
+        var len = cornerSize;
         ctx.strokeStyle = this.cornerColor;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = cornerWidth;
         // top-left
         ctx.beginPath();
         ctx.moveTo(l, t + len);
@@ -21657,6 +21659,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       this._renderTextBackground(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
+      this._setGradient(ctx);
       this._renderText(ctx);
       this._renderTextDecoration(ctx);
       this.clipTo && ctx.restore();
@@ -21863,6 +21866,31 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       }
 
       this._renderTextCommon(ctx, 'fillText');
+    },
+
+    /**
+     * 设置渐变笔触
+     * @private
+     */
+    _setGradient: function(ctx) {
+      if (this.gradient) {
+        var height = this.fontSize;
+        var width = this.width;
+        var array = this.gradient.array;
+        var isHorizon = this.gradient.horizon ? true : false;
+        var gradient = ctx.createLinearGradient(0 , 0, isHorizon ? width / 2.1 : 0, !isHorizon ? height / 2 : 0);
+
+        console.log('_setGradient', width);
+        for (var i in array) {
+          var item = array[i];
+          if (item.point !== undefined && item.point <= 1 && item.color) {
+            gradient.addColorStop(item.point, item.color);
+            console.log(item);
+          }
+        }
+
+        ctx.fillStyle = gradient;
+      }
     },
 
     /**

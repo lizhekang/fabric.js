@@ -39,16 +39,34 @@
   });
   canvas.add(rect);
 
-  let text = new fabric.Text('test 123!', {
+  let text = new fabric.Text('彩虹', {
     left: 10,
     top: 10,
     borderColor: "#fff",
     borderLineWidth: 2,
     cornerSize: 24,
     cornerStyle: "editor",
-    fill: "#ffbb3b",
+    fill: "#000",
     fontFamily: "Noto Sans",
     fontSize: 50,
+    gradient: {
+      horizon: true,
+      array: [{
+        point: .0,
+        color: "#2df73e"
+      },{
+        point: .2,
+        color: "#53a0fd"
+      },{
+        point: .8   ,
+        color: "#ff2489"
+      },{
+        point: 1,
+        color: "#b4ec51"
+      }]
+    },
+    stroke: '#fff',
+    strokeWidth: 2,
     hasRotatingPoint: false
   });
   canvas.add(text);
