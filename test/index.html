@@ -71,6 +71,22 @@
   });
   canvas.add(text);
   canvas.renderAll();
+  text = new fabric.Text('不是彩虹', {
+    left: 10,
+    top: 10,
+    borderColor: "#fff",
+    borderLineWidth: 2,
+    cornerSize: 24,
+    cornerStyle: "editor",
+    fill: "#000",
+    fontFamily: "Noto Sans",
+    fontSize: 50,
+    stroke: '#fff',
+    strokeWidth: 2,
+    hasRotatingPoint: false
+  });
+  canvas.add(text);
+  canvas.renderAll();
   canvas.on('object:remove', (params) => {
     setTimeout(() => {
       let obj = canvas.getActiveObject();
