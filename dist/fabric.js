@@ -21878,7 +21878,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
         var width = this.width;
         var array = this.gradient.array;
         var isHorizon = this.gradient.horizon ? true : false;
-        var gradient = ctx.createLinearGradient(0 , 0, isHorizon ? width / 2.1 : 0, !isHorizon ? height / 2 : 0);
+        var gradient = ctx.createLinearGradient(0 , 0, isHorizon ? width / 2 : 0, !isHorizon ? height / 2 : 0);
 
         console.log('_setGradient', width);
         for (var i in array) {
