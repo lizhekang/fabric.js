@@ -607,12 +607,14 @@
       var groupSelector = this._groupSelector;
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
-        pointer = this.getPointer(e, true);
+        if (!this.noSelector) {
+          pointer = this.getPointer(e, true);
 
-        groupSelector.left = pointer.x - groupSelector.ex;
-        groupSelector.top = pointer.y - groupSelector.ey;
+          groupSelector.left = pointer.x - groupSelector.ex;
+          groupSelector.top = pointer.y - groupSelector.ey;
 
-        this.renderTop();
+          this.renderTop();
+        }
       }
       else if (!this._currentTransform) {
         target = this.findTarget(e);
@@ -621,6 +623,7 @@
       else {
         this._transformObject(e);
       }
+
       this._handleEvent(e, 'move', target ? target : null);
     },
 

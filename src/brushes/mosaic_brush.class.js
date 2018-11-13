@@ -18,7 +18,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       ctx = lowerCanvas.getContext('2d');
 
     var blocksize =  this.blocksize || 10;
-    console.log(blocksize);
+
     // 临时图层用于存放经过马赛克处理的原图
     // 大小为用户所见canvas大小
     patternCanvas.width = clientWidth;

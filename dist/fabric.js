@@ -8394,7 +8394,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       ctx = lowerCanvas.getContext('2d');
 
     var blocksize =  this.blocksize || 10;
-    console.log(blocksize);
+
     // 临时图层用于存放经过马赛克处理的原图
     // 大小为用户所见canvas大小
     patternCanvas.width = clientWidth;
@@ -10791,12 +10791,14 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       var groupSelector = this._groupSelector;
       // We initially clicked in an empty area, so we draw a box for multiple selection
       if (groupSelector) {
-        pointer = this.getPointer(e, true);
+        if (!this.noSelector) {
+          pointer = this.getPointer(e, true);
 
-        groupSelector.left = pointer.x - groupSelector.ex;
-        groupSelector.top = pointer.y - groupSelector.ey;
+          groupSelector.left = pointer.x - groupSelector.ex;
+          groupSelector.top = pointer.y - groupSelector.ey;
 
-        this.renderTop();
+          this.renderTop();
+        }
       }
       else if (!this._currentTransform) {
         target = this.findTarget(e);
@@ -10805,6 +10807,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
       else {
         this._transformObject(e);
       }
+
       this._handleEvent(e, 'move', target ? target : null);
     },
 

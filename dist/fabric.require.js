@@ -5451,7 +5451,6 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
     getPatternSrc: function() {
         var patternCanvas = fabric.document.createElement("canvas"), patternCtx = patternCanvas.getContext("2d"), lowerCanvas = document.querySelector(this.lowerQuery), realHeight = lowerCanvas.height, realWidth = lowerCanvas.width, upperCanvas = document.querySelector(this.upperQuery), clientHeight = upperCanvas.height, clientWidth = upperCanvas.width, ctx = lowerCanvas.getContext("2d");
         var blocksize = this.blocksize || 10;
-        console.log(blocksize);
         patternCanvas.width = clientWidth;
         patternCanvas.height = clientHeight;
         patternCtx.scale(clientWidth / realWidth, clientHeight / realHeight);
@@ -6721,10 +6720,12 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
             }
             var groupSelector = this._groupSelector;
             if (groupSelector) {
-                pointer = this.getPointer(e, true);
-                groupSelector.left = pointer.x - groupSelector.ex;
-                groupSelector.top = pointer.y - groupSelector.ey;
-                this.renderTop();
+                if (!this.noSelector) {
+                    pointer = this.getPointer(e, true);
+                    groupSelector.left = pointer.x - groupSelector.ex;
+                    groupSelector.top = pointer.y - groupSelector.ey;
+                    this.renderTop();
+                }
             } else if (!this._currentTransform) {
                 target = this.findTarget(e);
                 this._setCursorFromEvent(e, target);
