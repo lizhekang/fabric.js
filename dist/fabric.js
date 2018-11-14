@@ -8404,10 +8404,14 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
     // 所以需要做缩放动作再写入临时图层
     patternCtx.scale(clientWidth / realWidth, clientHeight / realHeight);
     patternCtx.drawImage(ctx.canvas, 0, 0);
+
+    // 有优化空间
+    // TODO:
     var imageData = patternCtx.getImageData(0, 0, realWidth, realHeight);
+    var mosaicData = getMosaicData(imageData, blocksize);
 
     // 马赛克处理
-    patternCtx.putImageData(getMosaicData(imageData, blocksize), 0, 0);
+    patternCtx.putImageData(mosaicData, 0, 0);
 
     function getMosaicData(imageData, blocksize) {
       var data = imageData.data,
@@ -8452,6 +8456,12 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
     return patternCanvas;
   },
 
+  getDataUrlFromPatternSrc: function() {
+    return {
+      src: this.getPatternSrc().toDataURL(),
+    }
+  },
+
   getPatternSrcFunction: function() {
     return String(this.getPatternSrc)
       .replace('this.upperQuery', '"' + this.upperQuery + '"')
@@ -8485,10 +8495,23 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
    */
   createPath: function(pathData) {
     var path = this.callSuper('createPath', pathData),
-        topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+        topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2),
+        source = '';
+
+    if (this._mosaic_cache && this._mosaic_cache.mosaicSign === this.mosaicSign) {
+      source = this._mosaic_cache.source;
+    } else {
+      source = this.getPatternSrc();
+
+      this._mosaic_cache = {
+        mosaicSign: this.mosaicSign,
+        source: source
+      }
+    }
 
     path.stroke = new fabric.Pattern({
-      source: this.source || this.getPatternSrcFunction(),
+      // source: this.source || this.getPatternSrcFunction(),
+      source: source,
       offsetX: -topLeft.x,
       offsetY: -topLeft.y
     });

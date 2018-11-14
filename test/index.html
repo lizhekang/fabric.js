@@ -113,8 +113,9 @@
     // 笔刷
     var brush = new fabric.MosaicBrush(canvas);
     canvas.freeDrawingBrush = brush;
-    canvas.freeDrawingBrush.width = 50;
-    canvas.freeDrawingBrush.blocksize = 10;
+    canvas.freeDrawingBrush.width = 8;
+    canvas.freeDrawingBrush.blocksize = 4;
+    canvas.freeDrawingBrush.mosaicSign = new Date().getTime();
   }
 
   // 图片选择

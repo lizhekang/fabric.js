@@ -5456,7 +5456,8 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
         patternCtx.scale(clientWidth / realWidth, clientHeight / realHeight);
         patternCtx.drawImage(ctx.canvas, 0, 0);
         var imageData = patternCtx.getImageData(0, 0, realWidth, realHeight);
-        patternCtx.putImageData(getMosaicData(imageData, blocksize), 0, 0);
+        var mosaicData = getMosaicData(imageData, blocksize);
+        patternCtx.putImageData(mosaicData, 0, 0);
         function getMosaicData(imageData, blocksize) {
             var data = imageData.data, iLen = imageData.height, jLen = imageData.width, index, i, j, r, g, b, a;
             for (i = 0; i < iLen; i += blocksize) {
@@ -5481,6 +5482,11 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
         }
         return patternCanvas;
     },
+    getDataUrlFromPatternSrc: function() {
+        return {
+            src: this.getPatternSrc().toDataURL()
+        };
+    },
     getPatternSrcFunction: function() {
         return String(this.getPatternSrc).replace("this.upperQuery", '"' + this.upperQuery + '"').replace("this.lowerQuery", '"' + this.lowerQuery + '"').replace("this.blocksize", this.blocksize);
     },
@@ -5496,9 +5502,18 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, {
         this.canvas.contextTop.strokeStyle = this.getPattern();
     },
     createPath: function(pathData) {
-        var path = this.callSuper("createPath", pathData), topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2);
+        var path = this.callSuper("createPath", pathData), topLeft = path._getLeftTopCoords().scalarAdd(path.strokeWidth / 2), source = "";
+        if (this._mosaic_cache && this._mosaic_cache.mosaicSign === this.mosaicSign) {
+            source = this._mosaic_cache.source;
+        } else {
+            source = this.getPatternSrc();
+            this._mosaic_cache = {
+                mosaicSign: this.mosaicSign,
+                source: source
+            };
+        }
         path.stroke = new fabric.Pattern({
-            source: this.source || this.getPatternSrcFunction(),
+            source: source,
             offsetX: -topLeft.x,
             offsetY: -topLeft.y
         });
