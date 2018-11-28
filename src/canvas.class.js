@@ -587,7 +587,7 @@
           if (target.cornerStyle === 'editor') {
             return 'remove';
           }
-        case 'bl':
+        case 'br':
           if (target.cornerStyle === 'editor') {
             return 'scale&rotate';
           }

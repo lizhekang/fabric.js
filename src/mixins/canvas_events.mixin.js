@@ -325,7 +325,8 @@
         if (target.cornerStyle === 'editor') {
           var corner = target._findTargetCorner(this.getPointer(e, true));
           if (corner === 'tr') {
-            this.fire('object:remove', target)
+            this.fire('object:remove', target);
+            return;
           }
         }
       }

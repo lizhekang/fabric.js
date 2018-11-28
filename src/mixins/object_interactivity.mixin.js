@@ -345,7 +345,7 @@
         ctx.drawImage(del, left + width + extra, top, this.cornerSize, this.cornerSize);
 
         // bottom-left
-        ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
+        ctx.drawImage(resize, left + width + extra, top + height, this.cornerSize, this.cornerSize);
       } else if (this.cornerStyle === 'cropper') {
         var cornerSize = this.cornerSize || 48;
         var cornerWidth = this.cornerWidth || 4;

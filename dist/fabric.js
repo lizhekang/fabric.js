@@ -9109,7 +9109,7 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
           if (target.cornerStyle === 'editor') {
             return 'remove';
           }
-        case 'bl':
+        case 'br':
           if (target.cornerStyle === 'editor') {
             return 'scale&rotate';
           }
@@ -10532,7 +10532,8 @@ fabric.MosaicBrush = fabric.util.createClass(fabric.PencilBrush, /** @lends fabr
         if (target.cornerStyle === 'editor') {
           var corner = target._findTargetCorner(this.getPointer(e, true));
           if (corner === 'tr') {
-            this.fire('object:remove', target)
+            this.fire('object:remove', target);
+            return;
           }
         }
       }
@@ -14643,7 +14644,7 @@ fabric.util.object.extend(fabric.Object.prototype, /** @lends fabric.Object.prot
         ctx.drawImage(del, left + width + extra, top, this.cornerSize, this.cornerSize);
 
         // bottom-left
-        ctx.drawImage(resize, left - extra, top + height, this.cornerSize, this.cornerSize);
+        ctx.drawImage(resize, left + width + extra, top + height, this.cornerSize, this.cornerSize);
       } else if (this.cornerStyle === 'cropper') {
         var cornerSize = this.cornerSize || 48;
         var cornerWidth = this.cornerWidth || 4;
