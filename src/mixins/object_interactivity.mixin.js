@@ -61,13 +61,13 @@
 
         // canvas.contextTop.fillRect(lines.bottomline.d.x, lines.bottomline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.bottomline.o.x, lines.bottomline.o.y, 2, 2);
-
+        //
         // canvas.contextTop.fillRect(lines.leftline.d.x, lines.leftline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.leftline.o.x, lines.leftline.o.y, 2, 2);
-
+        //
         // canvas.contextTop.fillRect(lines.topline.d.x, lines.topline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.topline.o.x, lines.topline.o.y, 2, 2);
-
+        //
         // canvas.contextTop.fillRect(lines.rightline.d.x, lines.rightline.d.y, 2, 2);
         // canvas.contextTop.fillRect(lines.rightline.o.x, lines.rightline.o.y, 2, 2);
 
@@ -87,11 +87,14 @@
      */
     _setCornerCoords: function () {
       var coords = this.oCoords,
+        extra = this.cornerStyle === 'editor' ? this.cornerSize / 2 : 0,
         newTheta = degreesToRadians(45 - this.angle),
         /* Math.sqrt(2 * Math.pow(this.cornerSize, 2)) / 2, */
         /* 0.707106 stands for sqrt(2)/2 */
         cornerHypotenuse = this.cornerSize * 0.707106,
-        cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
+        // cosHalfOffset = cornerHypotenuse * Math.cos(newTheta),
+        // sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
+        cosHalfOffset = (cornerHypotenuse + extra) * Math.cos(newTheta),
         sinHalfOffset = cornerHypotenuse * Math.sin(newTheta),
         x, y;
 

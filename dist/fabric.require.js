@@ -8184,7 +8184,7 @@ fabric.util.object.extend(fabric.Object.prototype, {
             return false;
         },
         _setCornerCoords: function() {
-            var coords = this.oCoords, newTheta = degreesToRadians(45 - this.angle), cornerHypotenuse = this.cornerSize * .707106, cosHalfOffset = cornerHypotenuse * Math.cos(newTheta), sinHalfOffset = cornerHypotenuse * Math.sin(newTheta), x, y;
+            var coords = this.oCoords, extra = this.cornerStyle === "editor" ? this.cornerSize / 2 : 0, newTheta = degreesToRadians(45 - this.angle), cornerHypotenuse = this.cornerSize * .707106, cosHalfOffset = (cornerHypotenuse + extra) * Math.cos(newTheta), sinHalfOffset = cornerHypotenuse * Math.sin(newTheta), x, y;
             for (var point in coords) {
                 x = coords[point].x;
                 y = coords[point].y;
