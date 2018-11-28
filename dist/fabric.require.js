@@ -11410,8 +11410,8 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this.clipTo && ctx.restore();
         },
         _renderText: function(ctx) {
-            this._renderTextFill(ctx);
             this._renderTextStroke(ctx);
+            this._renderTextFill(ctx);
         },
         _setTextStyles: function(ctx) {
             ctx.textBaseline = "alphabetic";
