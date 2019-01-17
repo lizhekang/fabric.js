@@ -1818,7 +1818,7 @@ fabric.Collection = {
             return Array.from(a);
         }, da = 1 / 0, W = 0 / 0, Ia = /^\s+|\s+$/g, Ma = /^[-+]0x[0-9a-f]+$/i, Ja = /^0b[01]+$/i, Ka = /^0o[0-7]+$/i, La = parseInt, Ha = Object.prototype.toString, Fb = function(a, b, c) {
             if (!a || !a.length) return [];
-            c || void 0 === b ? c = 1 : ((c = b) ? (c = r(c), c = c === da || c === -da ? 1.7976931348623157e308 * (0 > c ? -1 : 1) : c === c ? c : 0) : c = 0 === c ? c : 0, 
+            c || void 0 === b ? c = 1 : ((c = b) ? (c = r(c), c = c === da || c === -da ? 17976931348623157e292 * (0 > c ? -1 : 1) : c === c ? c : 0) : c = 0 === c ? c : 0, 
             b = c % 1, c = c === c ? b ? c - b : c : 0);
             b = c;
             c = 0;
@@ -2561,7 +2561,7 @@ fabric.Collection = {
         var Fa = 1 / 0, ra = 0 / 0, sb = /^\s+|\s+$/g, wb = /^[-+]0x[0-9a-f]+$/i, tb = /^0b[01]+$/i, ub = /^0o[0-7]+$/i, vb = parseInt, rb = Object.prototype.toString, Ib = function(a, b, c) {
             var d = a ? a.length : 0;
             if (!d) return [];
-            c || void 0 === b ? b = 1 : (b ? (b = qb(b), b = b === Fa || b === -Fa ? 1.7976931348623157e308 * (0 > b ? -1 : 1) : b === b ? b : 0) : b = 0 === b ? b : 0, 
+            c || void 0 === b ? b = 1 : (b ? (b = qb(b), b = b === Fa || b === -Fa ? 17976931348623157e292 * (0 > b ? -1 : 1) : b === b ? b : 0) : b = 0 === b ? b : 0, 
             c = b % 1, b = b === b ? c ? b - c : b : 0);
             b = d - b;
             b = 0 > b ? 0 : b;
@@ -11336,7 +11336,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
 
 (function(global) {
     "use strict";
-    var fabric = global.fabric || (global.fabric = {}), clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, MIN_TEXT_WIDTH = 2;
+    var fabric = global.fabric || (global.fabric = {}), clone = fabric.util.object.clone, toFixed = fabric.util.toFixed, NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS, MIN_TEXT_WIDTH = 2, LOADED_CACHE = {};
     if (fabric.Text) {
         fabric.warn("fabric.Text is already defined");
         return;
@@ -11402,6 +11402,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             this._setShadow(ctx);
             this._setupCompositeOperation(ctx);
             this._renderTextBackground(ctx);
+            this._renderTextOuterDecoration(ctx);
             this._setStrokeStyles(ctx);
             this._setFillStyles(ctx);
             this._setGradient(ctx);
@@ -11658,6 +11659,73 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             if (offsets.length > 0) {
                 renderLinesAtOffset(offsets);
             }
+        },
+        _renderTextOuterDecoration: function(ctx) {
+            if (!this.outerDecotation) {
+                return;
+            }
+            ctx.lineWidth = this.outerDecotation.borderLineWidth;
+            ctx.strokeStyle = this.outerDecotation.borderColor;
+            var offsetX = this.outerDecotation.offsetX || 0, offsetY = this.outerDecotation.offsetY || 0, x = -this.width / 2 - offsetX, y = -this.height / 2 - offsetY, w = this.width + offsetX * 2, h = this.height + offsetY * 2, r = this.outerDecotation.radius || 4, cornerSize = this.outerDecotation.cornerSize || 30, x1 = x - cornerSize / 2, y1 = y - cornerSize / 2, x2 = x - cornerSize / 2 + w, y2 = y - cornerSize / 2 + h;
+            var min_size = Math.min(w, h);
+            if (r > min_size / 2) r = min_size / 2;
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.arcTo(x + w, y, x + w, y + h, r);
+            ctx.arcTo(x + w, y + h, x, y + h, r);
+            ctx.arcTo(x, y + h, x, y, r);
+            ctx.arcTo(x, y, x + w, y, r);
+            ctx.closePath();
+            ctx.fillStyle = this.outerDecotation.backgroundColor;
+            ctx.fill();
+            ctx.stroke();
+            var drawImage = function(ctx, that) {
+                return function(src, x, y, size) {
+                    that._loadImage(src, function(img, isCache) {
+                        isCache && ctx.drawImage(img, x, y, size, size);
+                    }, ctx, true, function() {
+                        that.render(ctx);
+                    });
+                };
+            }(ctx, this);
+            this.outerDecotation.tl && drawImage(this.outerDecotation.tl, x1, y1, cornerSize, cornerSize);
+            this.outerDecotation.tr && drawImage(this.outerDecotation.tr, x2, y1, cornerSize, cornerSize);
+            this.outerDecotation.bl && drawImage(this.outerDecotation.bl, x1, y2, cornerSize, cornerSize);
+            this.outerDecotation.br && drawImage(this.outerDecotation.br, x2, y2, cornerSize, cornerSize);
+        },
+        _loadImage: function(url, callback, context, crossOrigin, onload) {
+            if (!url) {
+                callback && callback.call(context, url);
+                return;
+            } else if (LOADED_CACHE[url]) {
+                if (LOADED_CACHE[url].loaded) {
+                    callback && callback.call(context, LOADED_CACHE[url].img, true);
+                } else {
+                    return;
+                }
+                return;
+            }
+            var img = fabric.util.createImage();
+            LOADED_CACHE[url] = {
+                loaded: false,
+                img: img
+            };
+            img.onload = function() {
+                callback && callback.call(context, img);
+                LOADED_CACHE[url].loaded = true;
+                img = img.onload = img.onerror = null;
+                onload && onload();
+            };
+            img.onerror = function() {
+                fabric.log("Error loading " + img.src);
+                callback && callback.call(context, null, true);
+                img = img.onload = img.onerror = null;
+                LOADED_CACHE[url] = null;
+            };
+            if (url.indexOf("data") !== 0 && crossOrigin) {
+                img.crossOrigin = crossOrigin;
+            }
+            img.src = url;
         },
         _getFontDeclaration: function() {
             return [ fabric.isLikelyNode ? this.fontWeight : this.fontStyle, fabric.isLikelyNode ? this.fontStyle : this.fontWeight, this.fontSize + "px", fabric.isLikelyNode ? '"' + this.fontFamily + '"' : this.fontFamily ].join(" ");

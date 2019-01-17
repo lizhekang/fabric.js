@@ -6,7 +6,8 @@
       clone = fabric.util.object.clone,
       toFixed = fabric.util.toFixed,
       NUM_FRACTION_DIGITS = fabric.Object.NUM_FRACTION_DIGITS,
-      MIN_TEXT_WIDTH = 2;
+      MIN_TEXT_WIDTH = 2,
+      LOADED_CACHE = {};
 
   if (fabric.Text) {
     fabric.warn('fabric.Text is already defined');
@@ -35,7 +36,6 @@
    * @see {@link fabric.Text#initialize} for constructor definition
    */
   fabric.Text = fabric.util.createClass(fabric.Object, /** @lends fabric.Text.prototype */ {
-
     /**
      * Properties which when set cause object to change dimensions
      * @type Object
@@ -382,6 +382,7 @@
       this._setShadow(ctx);
       this._setupCompositeOperation(ctx);
       this._renderTextBackground(ctx);
+      this._renderTextOuterDecoration(ctx);
       this._setStrokeStyles(ctx);
       this._setFillStyles(ctx);
       this._setGradient(ctx);
@@ -836,6 +837,121 @@
       if (offsets.length > 0) {
         renderLinesAtOffset(offsets);
       }
+    },
+    
+    /**
+     * @private
+     * @param {CanvasRenderingContext2D} ctx Context to render on
+     */
+    _renderTextOuterDecoration: function(ctx) {
+      // do some render job
+      if (!this.outerDecotation) {
+        return ;
+      }
+
+      ctx.lineWidth = this.outerDecotation.borderLineWidth;
+      ctx.strokeStyle = this.outerDecotation.borderColor;
+
+      var offsetX = this.outerDecotation.offsetX || 0,
+        offsetY = this.outerDecotation.offsetY || 0,
+        x = -this.width / 2 - offsetX,
+        y = -this.height / 2 - offsetY,
+        w = this.width + offsetX * 2,
+        h = this.height + offsetY * 2,
+        r = this.outerDecotation.radius || 4,
+        cornerSize = this.outerDecotation.cornerSize || 30,
+        x1 = x - cornerSize / 2,
+        y1 = y - cornerSize / 2,
+        x2 = x - cornerSize / 2 + w,
+        y2 = y - cornerSize / 2 + h;
+
+      var min_size = Math.min(w, h);
+      if (r > min_size / 2) r = min_size / 2;
+      
+      // draw border
+      // draw background
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+
+      ctx.fillStyle = this.outerDecotation.backgroundColor;
+      ctx.fill();
+      ctx.stroke();
+
+      var drawImage = (function (ctx, that) {
+        return function (src, x, y, size) {
+          that._loadImage(src, function (img, isCache) {
+            isCache && ctx.drawImage(img, x, y, size, size);  // 保证只有在图片都被缓存后再绘制
+          }, ctx, true, function () {
+            that.render(ctx);
+          })
+        }
+      })(ctx, this);
+
+      // draw corner;
+      this.outerDecotation.tl && drawImage(this.outerDecotation.tl, x1, y1, cornerSize, cornerSize);
+      this.outerDecotation.tr && drawImage(this.outerDecotation.tr, x2, y1, cornerSize, cornerSize);
+      this.outerDecotation.bl && drawImage(this.outerDecotation.bl, x1, y2, cornerSize, cornerSize);
+      this.outerDecotation.br && drawImage(this.outerDecotation.br, x2, y2, cornerSize, cornerSize);
+    },
+
+    /**
+     * Loads image element from given url and passes it to a callback
+     * @private
+     * @memberOf fabric.util
+     * @param {String} url URL representing an image
+     * @param {Function} callback Callback; invoked with loaded image
+     * @param {*} [context] Context to invoke callback in
+     * @param {Object} [crossOrigin] crossOrigin value to set image element to
+     */
+    _loadImage: function(url, callback, context, crossOrigin, onload) {
+      if (!url) {
+        callback && callback.call(context, url);
+        return;
+      } else if (LOADED_CACHE[url]) {
+        if (LOADED_CACHE[url].loaded) { // 加载中优化
+          callback && callback.call(context, LOADED_CACHE[url].img, true);
+        } else {
+          return;
+        }
+        return;
+      }
+
+      var img = fabric.util.createImage();
+      LOADED_CACHE[url] = {
+        loaded: false,
+        img: img
+      }
+
+      /** @ignore */
+      img.onload = function () {
+        callback && callback.call(context, img);
+        LOADED_CACHE[url].loaded = true;
+        img = img.onload = img.onerror = null;
+        onload && onload();
+      };
+
+      /** @ignore */
+      img.onerror = function() {
+        fabric.log('Error loading ' + img.src);
+        callback && callback.call(context, null, true);
+        img = img.onload = img.onerror = null;
+        LOADED_CACHE[url] = null;
+      };
+
+      // data-urls appear to be buggy with crossOrigin
+      // https://github.com/kangax/fabric.js/commit/d0abb90f1cd5c5ef9d2a94d3fb21a22330da3e0a#commitcomment-4513767
+      // see https://code.google.com/p/chromium/issues/detail?id=315152
+      //     https://bugzilla.mozilla.org/show_bug.cgi?id=935069
+      if (url.indexOf('data') !== 0 && crossOrigin) {
+        img.crossOrigin = crossOrigin;
+      }
+
+      img.src = url;
     },
 
     /**
