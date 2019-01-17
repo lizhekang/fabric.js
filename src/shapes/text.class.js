@@ -838,7 +838,7 @@
         renderLinesAtOffset(offsets);
       }
     },
-    
+
     /**
      * @private
      * @param {CanvasRenderingContext2D} ctx Context to render on
@@ -863,11 +863,12 @@
           x1 = x - cornerSize / 2,
           y1 = y - cornerSize / 2,
           x2 = x - cornerSize / 2 + w,
-          y2 = y - cornerSize / 2 + h;
+          y2 = y - cornerSize / 2 + h,
+          loadingImg = 0;
 
       var min_size = Math.min(w, h);
       if (r > min_size / 2) r = min_size / 2;
-      
+
       // draw border
       // draw background
       ctx.beginPath();
@@ -882,12 +883,22 @@
       ctx.fill();
       ctx.stroke();
 
+
       var drawImage = (function (ctx, that) {
         return function (src, x, y, size) {
+          if (!LOADED_CACHE[src] || (LOADED_CACHE[src] && !LOADED_CACHE[src].loaded)) {
+            loadingImg ++;
+          }
           that._loadImage(src, function (img, isCache) {
+            if (!isCache) {
+              loadingImg --;
+            }
+
             isCache && ctx.drawImage(img, x, y, size, size);  // 保证只有在图片都被缓存后再绘制
           }, ctx, true, function () {
             that.render(ctx);
+            console.log(loadingImg);
+            loadingImg === 0 ? that.fire('image:loaded') : null;
           })
         }
       })(ctx, this);

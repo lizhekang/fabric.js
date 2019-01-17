@@ -65,6 +65,9 @@
     fontSize: 24,
     hasRotatingPoint: false
   });
+  text.on('image:loaded', () => {
+    console.log('render');
+  })
   canvas.add(text);
   canvas.renderAll();
   // text = new fabric.Text('不是彩虹', {
