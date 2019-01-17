@@ -22150,21 +22150,21 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
      */
     _renderTextOuterDecoration: function(ctx) {
       // do some render job
-      if (!this.outerDecotation) {
+      if (!this.outerDecoration) {
         return ;
       }
 
-      ctx.lineWidth = this.outerDecotation.borderLineWidth;
-      ctx.strokeStyle = this.outerDecotation.borderColor;
+      ctx.lineWidth = this.outerDecoration.borderLineWidth;
+      ctx.strokeStyle = this.outerDecoration.borderColor;
 
-      var offsetX = this.outerDecotation.offsetX || 0,
-          offsetY = this.outerDecotation.offsetY || 0,
+      var offsetX = this.outerDecoration.offsetX || 0,
+          offsetY = this.outerDecoration.offsetY || 0,
           x = -this.width / 2 - offsetX,
           y = -this.height / 2 - offsetY,
           w = this.width + offsetX * 2,
           h = this.height + offsetY * 2,
-          r = this.outerDecotation.radius || 4,
-          cornerSize = this.outerDecotation.cornerSize || 30,
+          r = this.outerDecoration.radius || 4,
+          cornerSize = this.outerDecoration.cornerSize || 30,
           x1 = x - cornerSize / 2,
           y1 = y - cornerSize / 2,
           x2 = x - cornerSize / 2 + w,
@@ -22184,7 +22184,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
       ctx.arcTo(x, y, x + w, y, r);
       ctx.closePath();
 
-      ctx.fillStyle = this.outerDecotation.backgroundColor;
+      ctx.fillStyle = this.outerDecoration.backgroundColor;
       ctx.fill();
       ctx.stroke();
 
@@ -22201,18 +22201,17 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass(/** @lends fabric.Imag
 
             isCache && ctx.drawImage(img, x, y, size, size);  // 保证只有在图片都被缓存后再绘制
           }, ctx, true, function () {
-            that.render(ctx);
-            console.log(loadingImg);
-            loadingImg === 0 ? that.fire('image:loaded') : null;
+            loadingImg === 0 ? that.render(ctx) : null;
           })
         }
       })(ctx, this);
 
       // draw corner;
-      this.outerDecotation.tl && drawImage(this.outerDecotation.tl, x1, y1, cornerSize, cornerSize);
-      this.outerDecotation.tr && drawImage(this.outerDecotation.tr, x2, y1, cornerSize, cornerSize);
-      this.outerDecotation.bl && drawImage(this.outerDecotation.bl, x1, y2, cornerSize, cornerSize);
-      this.outerDecotation.br && drawImage(this.outerDecotation.br, x2, y2, cornerSize, cornerSize);
+      this.outerDecoration.tl && drawImage(this.outerDecoration.tl, x1, y1, cornerSize, cornerSize);
+      this.outerDecoration.tr && drawImage(this.outerDecoration.tr, x2, y1, cornerSize, cornerSize);
+      this.outerDecoration.bl && drawImage(this.outerDecoration.bl, x1, y2, cornerSize, cornerSize);
+      this.outerDecoration.br && drawImage(this.outerDecoration.br, x2, y2, cornerSize, cornerSize);
+      loadingImg === 0 ? this.fire('render:success') : null;
     },
 
     /**

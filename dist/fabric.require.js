@@ -11661,12 +11661,12 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             }
         },
         _renderTextOuterDecoration: function(ctx) {
-            if (!this.outerDecotation) {
+            if (!this.outerDecoration) {
                 return;
             }
-            ctx.lineWidth = this.outerDecotation.borderLineWidth;
-            ctx.strokeStyle = this.outerDecotation.borderColor;
-            var offsetX = this.outerDecotation.offsetX || 0, offsetY = this.outerDecotation.offsetY || 0, x = -this.width / 2 - offsetX, y = -this.height / 2 - offsetY, w = this.width + offsetX * 2, h = this.height + offsetY * 2, r = this.outerDecotation.radius || 4, cornerSize = this.outerDecotation.cornerSize || 30, x1 = x - cornerSize / 2, y1 = y - cornerSize / 2, x2 = x - cornerSize / 2 + w, y2 = y - cornerSize / 2 + h, loadingImg = 0;
+            ctx.lineWidth = this.outerDecoration.borderLineWidth;
+            ctx.strokeStyle = this.outerDecoration.borderColor;
+            var offsetX = this.outerDecoration.offsetX || 0, offsetY = this.outerDecoration.offsetY || 0, x = -this.width / 2 - offsetX, y = -this.height / 2 - offsetY, w = this.width + offsetX * 2, h = this.height + offsetY * 2, r = this.outerDecoration.radius || 4, cornerSize = this.outerDecoration.cornerSize || 30, x1 = x - cornerSize / 2, y1 = y - cornerSize / 2, x2 = x - cornerSize / 2 + w, y2 = y - cornerSize / 2 + h, loadingImg = 0;
             var min_size = Math.min(w, h);
             if (r > min_size / 2) r = min_size / 2;
             ctx.beginPath();
@@ -11676,7 +11676,7 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
             ctx.arcTo(x, y + h, x, y, r);
             ctx.arcTo(x, y, x + w, y, r);
             ctx.closePath();
-            ctx.fillStyle = this.outerDecotation.backgroundColor;
+            ctx.fillStyle = this.outerDecoration.backgroundColor;
             ctx.fill();
             ctx.stroke();
             var drawImage = function(ctx, that) {
@@ -11690,16 +11690,15 @@ fabric.Image.filters.BaseFilter = fabric.util.createClass({
                         }
                         isCache && ctx.drawImage(img, x, y, size, size);
                     }, ctx, true, function() {
-                        that.render(ctx);
-                        console.log(loadingImg);
-                        loadingImg === 0 ? that.fire("image:loaded") : null;
+                        loadingImg === 0 ? that.render(ctx) : null;
                     });
                 };
             }(ctx, this);
-            this.outerDecotation.tl && drawImage(this.outerDecotation.tl, x1, y1, cornerSize, cornerSize);
-            this.outerDecotation.tr && drawImage(this.outerDecotation.tr, x2, y1, cornerSize, cornerSize);
-            this.outerDecotation.bl && drawImage(this.outerDecotation.bl, x1, y2, cornerSize, cornerSize);
-            this.outerDecotation.br && drawImage(this.outerDecotation.br, x2, y2, cornerSize, cornerSize);
+            this.outerDecoration.tl && drawImage(this.outerDecoration.tl, x1, y1, cornerSize, cornerSize);
+            this.outerDecoration.tr && drawImage(this.outerDecoration.tr, x2, y1, cornerSize, cornerSize);
+            this.outerDecoration.bl && drawImage(this.outerDecoration.bl, x1, y2, cornerSize, cornerSize);
+            this.outerDecoration.br && drawImage(this.outerDecoration.br, x2, y2, cornerSize, cornerSize);
+            loadingImg === 0 ? this.fire("render:success") : null;
         },
         _loadImage: function(url, callback, context, crossOrigin, onload) {
             if (!url) {

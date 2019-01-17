@@ -43,7 +43,7 @@
   let text = new fabric.Text('新年好～', {
     left: 300,
     top: 300,
-    outerDecotation: {
+    outerDecoration: {
       backgroundColor: '#ffecd0',
       borderColor: '#cd1b1e',
       borderLineWidth: 2,
@@ -65,11 +65,13 @@
     fontSize: 24,
     hasRotatingPoint: false
   });
-  text.on('image:loaded', () => {
+  text.on('render:success', () => {
     console.log('render');
-  })
+  });
   canvas.add(text);
   canvas.renderAll();
+
+
   // text = new fabric.Text('不是彩虹', {
   //   left: 10,
   //   top: 10,
