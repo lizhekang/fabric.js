@@ -853,17 +853,17 @@
       ctx.strokeStyle = this.outerDecotation.borderColor;
 
       var offsetX = this.outerDecotation.offsetX || 0,
-        offsetY = this.outerDecotation.offsetY || 0,
-        x = -this.width / 2 - offsetX,
-        y = -this.height / 2 - offsetY,
-        w = this.width + offsetX * 2,
-        h = this.height + offsetY * 2,
-        r = this.outerDecotation.radius || 4,
-        cornerSize = this.outerDecotation.cornerSize || 30,
-        x1 = x - cornerSize / 2,
-        y1 = y - cornerSize / 2,
-        x2 = x - cornerSize / 2 + w,
-        y2 = y - cornerSize / 2 + h;
+          offsetY = this.outerDecotation.offsetY || 0,
+          x = -this.width / 2 - offsetX,
+          y = -this.height / 2 - offsetY,
+          w = this.width + offsetX * 2,
+          h = this.height + offsetY * 2,
+          r = this.outerDecotation.radius || 4,
+          cornerSize = this.outerDecotation.cornerSize || 30,
+          x1 = x - cornerSize / 2,
+          y1 = y - cornerSize / 2,
+          x2 = x - cornerSize / 2 + w,
+          y2 = y - cornerSize / 2 + h;
 
       var min_size = Math.min(w, h);
       if (r > min_size / 2) r = min_size / 2;
